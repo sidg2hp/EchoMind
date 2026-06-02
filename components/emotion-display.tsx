@@ -18,7 +18,7 @@ interface EmotionDisplayProps {
 
 const emotionConfig = {
   happy: {
-    color: "from-yellow-400 to-orange-400",
+    color: "from-yellow-400 to-amber-400",
     textColor: "text-yellow-400",
     bg: "bg-yellow-500/10",
     border: "border-yellow-500/30",
@@ -54,11 +54,11 @@ const emotionConfig = {
     description: "Anxious emotional pattern recognized",
   },
   disgust: {
-    color: "from-green-400 to-emerald-400",
-    textColor: "text-green-400",
-    bg: "bg-green-500/10",
-    border: "border-green-500/30",
-    glow: "shadow-green-500/20",
+    color: "from-emerald-400 to-green-400",
+    textColor: "text-emerald-400",
+    bg: "bg-emerald-500/10",
+    border: "border-emerald-500/30",
+    glow: "shadow-emerald-500/20",
     emoji: "🤢",
     description: "Aversive emotional response detected",
   },
@@ -94,122 +94,86 @@ const emotionConfig = {
 export function EmotionDisplay({ result, onReset }: EmotionDisplayProps) {
   const config = emotionConfig[result.emotion as keyof typeof emotionConfig] || emotionConfig.neutral
 
+  const radius = 35
+  const circumference = 2 * Math.PI * radius
+  const strokeDashoffset = circumference - (circumference * result.confidence)
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50, scale: 0.9 }}
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="h-full"
     >
-      <Card
-        className={`glassmorphic-card border-2 backdrop-blur-xl bg-slate-900/30 shadow-2xl ${config.border} ${config.glow}`}
-      >
-        <div className="p-8 text-center space-y-8">
-          {/* Success Indicator */}
-          <motion.div
-            className="flex items-center justify-center space-x-2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <CheckCircle className="h-5 w-5 text-green-400" />
-            <span className="text-green-400 font-medium">Analysis Complete</span>
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-            >
-              <Sparkles className="h-4 w-4 text-green-400" />
+      <Card className={`glassmorphic-card h-full border-2 backdrop-blur-xl bg-slate-900/60 shadow-2xl ${config.border} ${config.glow} flex flex-col justify-between overflow-hidden relative`}>
+        <div className={`absolute top-0 right-0 w-64 h-64 ${config.bg} rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 opacity-50`}></div>
+        
+        <div className="p-8 space-y-8 relative z-10">
+          <motion.div className="flex items-center space-x-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+            <CheckCircle className="h-5 w-5 text-emerald-400" />
+            <span className="text-emerald-400 font-medium">Neural Analysis Complete</span>
+            <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}>
+              <Sparkles className="h-4 w-4 text-emerald-400" />
             </motion.div>
           </motion.div>
 
-          {/* Main Emotion Display */}
-          <motion.div
-            className={`inline-flex items-center space-x-6 px-8 py-6 rounded-3xl border-2 backdrop-blur-sm ${config.bg} ${config.border} shadow-xl`}
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-            whileHover={{ scale: 1.05 }}
-          >
-            <motion.div
-              className="text-6xl"
-              animate={{
-                scale: [1, 1.1, 1],
-                rotate: [0, 5, -5, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Number.POSITIVE_INFINITY,
-                repeatDelay: 3,
-              }}
+          <div className="flex flex-col items-center text-center space-y-6">
+            <motion.div 
+              className={`p-6 rounded-full border-2 backdrop-blur-sm ${config.bg} ${config.border} shadow-xl`}
+              initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ delay: 0.3, type: "spring" }}
             >
-              {config.emoji}
+              <motion.div className="text-7xl" animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }} transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, repeatDelay: 3 }}>
+                {config.emoji}
+              </motion.div>
             </motion.div>
 
-            <div className="text-left space-y-2">
-              <motion.h2
-                className={`text-4xl font-orbitron font-bold capitalize bg-gradient-to-r ${config.color} bg-clip-text text-transparent`}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
-              >
+            <div className="space-y-2">
+              <p className="text-slate-400 text-sm tracking-widest uppercase font-semibold">Primary Emotion</p>
+              <motion.h2 className={`text-5xl font-orbitron font-bold capitalize bg-gradient-to-r ${config.color} bg-clip-text text-transparent`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
                 {result.emotion}
               </motion.h2>
-
-              <motion.div
-                className="space-y-1"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-32 bg-slate-700 rounded-full h-2 overflow-hidden">
-                    <motion.div
-                      className={`h-2 rounded-full bg-gradient-to-r ${config.color}`}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${result.confidence * 100}%` }}
-                      transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
-                    />
-                  </div>
-                  <span className="text-slate-300 font-mono text-sm">{(result.confidence * 100).toFixed(1)}%</span>
-                </div>
-                <p className="text-xs text-slate-400">Confidence Level</p>
-              </motion.div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Description */}
-          <motion.p
-            className="text-slate-300 text-lg max-w-md mx-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-          >
-            {config.description}
-          </motion.p>
+          <div className="flex items-center justify-center space-x-8 bg-slate-800/50 p-6 rounded-3xl border border-slate-700">
+            
+            <div className="relative w-28 h-28 flex items-center justify-center">
+              <svg className="transform -rotate-90 w-28 h-28">
+                <circle cx="56" cy="56" r="35" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-700" />
+                <motion.circle
+                  cx="56" cy="56" r="35" stroke="currentColor" strokeWidth="8" fill="transparent"
+                  strokeDasharray={circumference}
+                  initial={{ strokeDashoffset: circumference }}
+                  animate={{ strokeDashoffset }}
+                  transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
+                  className={`${config.textColor}`}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center flex-col">
+                <span className="font-mono font-bold text-xl text-white">{(result.confidence * 100).toFixed(0)}%</span>
+              </div>
+            </div>
 
-          {/* Processing Time */}
-          <motion.div
-            className="text-sm text-slate-400 space-y-1"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-          >
+            <div className="space-y-2 text-left flex-1">
+              <h4 className="text-white font-semibold text-lg">Confidence Score</h4>
+              <p className="text-slate-400 text-sm leading-relaxed">{config.description}</p>
+            </div>
+
+          </div>
+        </div>
+
+        <div className="p-8 pt-0 relative z-10 flex flex-col space-y-4">
+          <div className="flex justify-between items-center text-xs text-slate-500 px-2">
+            <p>Neural Network: CRNN</p>
             {typeof result.processing_time === "number" && (
-  <p>Processing Time: {result.processing_time.toFixed(2)}s</p>
-)}
-
-            <p>Neural Network: EmotionNet v2.1</p>
-          </motion.div>
-
-          {/* Reset Button */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
-            <Button
-              onClick={onReset}
-              className="bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white border-0 shadow-lg transition-all duration-300 hover:shadow-xl px-8 py-3 rounded-xl"
-            >
-              <RotateCcw className="h-5 w-5 mr-2" />
-              Analyze Another File
-            </Button>
-          </motion.div>
+              <p>Time: {result.processing_time.toFixed(2)}s</p>
+            )}
+          </div>
+          <Button onClick={onReset} className="w-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 shadow-lg py-6 rounded-xl text-lg">
+            <RotateCcw className="h-5 w-5 mr-2" />
+            Analyze Another File
+          </Button>
         </div>
       </Card>
     </motion.div>
