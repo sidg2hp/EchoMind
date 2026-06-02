@@ -1,6 +1,13 @@
 # 🎧 EchoMind: Real-Time Speech Emotion Recognition with CRNN
 
-EchoMind is a full-stack web application that predicts human emotions from speech using a Convolutional Recurrent Neural Network (CRNN). It supports real-time emotion prediction on audio files and provides a clean UI with waveform visualizations and results.
+EchoMind is a full-stack web application that predicts human emotions from speech using a Convolutional Recurrent Neural Network (CRNN). It supports real-time emotion prediction via direct microphone recording or audio file uploads, and provides a modern dashboard UI with waveform visualizations and analytical results.
+
+## ✨ Features
+
+- **In-App Microphone Recording**: Record your voice directly in the browser for instant neural analysis.
+- **Audio File Upload**: Drag and drop `.wav` files to analyze pre-recorded speech.
+- **Real-Time Visualization**: View dynamic audio waveforms of your input.
+- **Detailed Emotion Analytics**: Provides confidence scores across 8 emotional classes using a PyTorch CRNN.
 
 ---
 
